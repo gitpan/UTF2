@@ -11,7 +11,7 @@ use strict;
 use 5.00503;
 use vars qw($VERSION $_warning);
 
-$VERSION = sprintf '%d.%02d', q$Revision: 0.43 $ =~ m/(\d+)/xmsg;
+$VERSION = sprintf '%d.%02d', q$Revision: 0.44 $ =~ m/(\d+)/xmsg;
 
 use Fcntl;
 use Symbol;
@@ -173,6 +173,7 @@ sub Eutf2::capture($);
 sub Eutf2::ignorecase(@);
 sub Eutf2::chr(;$);
 sub Eutf2::chr_();
+sub Eutf2::filetest(@);
 sub Eutf2::r(;*@);
 sub Eutf2::w(;*@);
 sub Eutf2::x(;*@);
@@ -200,6 +201,7 @@ sub Eutf2::B(;*@);
 sub Eutf2::M(;*@);
 sub Eutf2::A(;*@);
 sub Eutf2::C(;*@);
+sub Eutf2::filetest_(@);
 sub Eutf2::r_();
 sub Eutf2::w_();
 sub Eutf2::x_();
@@ -1380,6 +1382,25 @@ sub Eutf2::chr_() {
 }
 
 #
+# UTF-2 stacked file test expr
+#
+sub Eutf2::filetest (@) {
+
+    my $file     = pop @_;
+    my $filetest = substr(pop @_, 1);
+
+    unless (eval qq{Eutf2::$filetest(\$file)}) {
+        return '';
+    }
+    for my $filetest (reverse @_) {
+        unless (eval qq{ $filetest _ }) {
+            return '';
+        }
+    }
+    return 1;
+}
+
+#
 # UTF-2 file test -r expr
 #
 sub Eutf2::r(;*@) {
@@ -2352,6 +2373,24 @@ sub Eutf2::C(;*@) {
         }
     }
     return wantarray ? (undef,@_) : undef;
+}
+
+#
+# UTF-2 stacked file test $_
+#
+sub Eutf2::filetest_ (@) {
+
+    my $filetest = substr(pop @_, 1);
+
+    unless (eval qq{Eutf2::${filetest}_}) {
+        return '';
+    }
+    for my $filetest (reverse @_) {
+        unless (eval qq{ $filetest _ }) {
+            return '';
+        }
+    }
+    return 1;
 }
 
 #
