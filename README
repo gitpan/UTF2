@@ -20,6 +20,15 @@ DESCRIPTION
       This software treats UTF-2 directly. Therefore, there is not UTF8 flag.
       So we can write the script in UTF-2 without UTF8 flag.
 
+NOTICE
+
+      UTF-2 is UTF-8, is not UCS-2.
+
+      UTF-2 expresses one character in variable-length from 1 to 4 bytes.
+      On the other hand, UCS-2 expresses one character by two byte fixation.
+      I wanted to name this software UTF8, however it is impossible
+      because there is already utf8 pragma.
+
 INSTALLATION
 
 To install this software, type the following:
