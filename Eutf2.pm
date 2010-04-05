@@ -18,7 +18,7 @@ use 5.00503;
 
 BEGIN { eval q{ use vars qw($VERSION $_warning) } }
 
-$VERSION = sprintf '%d.%02d', q$Revision: 0.52 $ =~ m/(\d+)/xmsg;
+$VERSION = sprintf '%d.%02d', q$Revision: 0.54 $ =~ m/(\d+)/xmsg;
 
 # poor Symbol.pm - substitute of real Symbol.pm
 BEGIN {
@@ -138,6 +138,20 @@ elsif (__PACKAGE__ eq 'Eutf2') {
         4 => [ [0xF0..0xF0],[0x90..0xBF],[0x80..0xBF],[0x80..0xBF],
                [0xF1..0xF3],[0x80..0xBF],[0x80..0xBF],[0x80..0xBF],
                [0xF4..0xF4],[0x80..0x8F],[0x80..0xBF],[0x80..0xBF],
+             ],
+    );
+}
+
+# Old UTF-8
+elsif (__PACKAGE__ eq 'Eoldutf8') {
+    %range_tr = (
+        1 => [ [0x00..0x7F],
+             ],
+        2 => [ [0xC0..0xDF],[0x80..0xBF],
+             ],
+        3 => [ [0xE0..0xEF],[0x80..0xBF],[0x80..0xBF],
+             ],
+        4 => [ [0xF0..0xF4],[0x80..0xBF],[0x80..0xBF],[0x80..0xBF],
              ],
     );
 }
@@ -542,39 +556,9 @@ sub Eutf2::rindex($$;$) {
 # UTF-2 regexp capture
 #
 {
-    # 10.3. Creating Persistent Private Variables
-    # in Chapter 10. Subroutines
-    # of ISBN 0-596-00313-7 Perl Cookbook, 2nd Edition.
-
-    my $last_s_matched = 0;
-
     sub Eutf2::capture($) {
-        if ($last_s_matched and ($_[0] =~ m/\A [1-9][0-9]* \z/oxms)) {
-            return $_[0] + 1;
-        }
-        else {
-            return $_[0];
-        }
+        return $_[0];
     }
-
-    # UTF-2 regexp mark last m// or qr// matched
-    sub Eutf2::m_matched() {
-        $last_s_matched = 0;
-    }
-
-    # UTF-2 regexp mark last s/// or qr matched
-    sub Eutf2::s_matched() {
-        $last_s_matched = 1;
-    }
-
-    # which matched of m// or s/// at last
-
-    # P.854 31.17. use re
-    # in Chapter 31. Pragmatic Modules
-    # of ISBN 0-596-00027-8 Programming Perl Third Edition.
-
-    @Eutf2::m_matched = (qr/(?{Eutf2::m_matched})/);
-    @Eutf2::s_matched = (qr/(?{Eutf2::s_matched})/);
 }
 
 #
@@ -982,9 +966,16 @@ sub _charlist {
         }
 
         # /i modifier
-        elsif ($char[$i] =~ m/\A [A-Za-z] \z/oxms) {
+        elsif ($char[$i] =~ m/\A [\x00-\xFF] \z/oxms) {
             if ($modifier =~ m/i/oxms) {
-                push @singleoctet, CORE::uc $char[$i], CORE::lc $char[$i];
+                my $uc = uc($char[$i]);
+                my $lc = lc($char[$i]);
+                if ($uc ne $lc) {
+                    push @singleoctet, $uc, $lc;
+                }
+                else {
+                    push @singleoctet, $char[$i];
+                }
             }
             else {
                 push @singleoctet, $char[$i];
@@ -1033,11 +1024,6 @@ sub _charlist {
         }
         elsif (m/\A [\x00-\xFF] \z/oxms) {
             $_ = quotemeta $_;
-        }
-    }
-    for (@charlist) {
-        if (m/\A ((?:[\xC2-\xDF]|[\xE0-\xE0][\xA0-\xBF]|[\xE1-\xEC][\x80-\xBF]|[\xED-\xED][\x80-\x9F]|[\xEE-\xEF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF])) ([\x00-\xFF]) \z/oxms) {
-            $_ = $1 . quotemeta $2;
         }
     }
 
@@ -1324,37 +1310,21 @@ OUTER:
 
         my $pattern = '';
         while ($expr =~ m/ \G ($q_char) /oxgc) {
-            $pattern .= {
-                '*' => "(?:$your_char)*",
-                '?' => "(?:$your_char)?",  # DOS style
-            #   '?' => "(?:$your_char)",   # UNIX style
-                'a' => 'A',
-                'b' => 'B',
-                'c' => 'C',
-                'd' => 'D',
-                'e' => 'E',
-                'f' => 'F',
-                'g' => 'G',
-                'h' => 'H',
-                'i' => 'I',
-                'j' => 'J',
-                'k' => 'K',
-                'l' => 'L',
-                'm' => 'M',
-                'n' => 'N',
-                'o' => 'O',
-                'p' => 'P',
-                'q' => 'Q',
-                'r' => 'R',
-                's' => 'S',
-                't' => 'T',
-                'u' => 'U',
-                'v' => 'V',
-                'w' => 'W',
-                'x' => 'X',
-                'y' => 'Y',
-                'z' => 'Z',
-            }->{$1} || quotemeta $1;
+            my $char = $1;
+            my $uc = uc($char);
+            if ($uc ne $char) {
+                $pattern .= $uc;
+            }
+            elsif ($char eq '*') {
+                $pattern .= "(?:$your_char)*",
+            }
+            elsif ($char eq '?') {
+                $pattern .= "(?:$your_char)?",  # DOS style
+#               $pattern .= "(?:$your_char)",   # UNIX style
+            }
+            else {
+                $pattern .= quotemeta $char;
+            }
         }
         my $matchsub = sub { uc($_[0]) =~ m{\A $pattern \z}xms };
 
