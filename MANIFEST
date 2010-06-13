@@ -1,5 +1,5 @@
-UTF2.pm
-Eutf2.pm
+lib/UTF2.pm
+lib/Eutf2.pm
 perl58.bat
 perl510.bat
 perl512.bat

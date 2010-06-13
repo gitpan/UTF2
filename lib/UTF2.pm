@@ -19,7 +19,7 @@ use Eutf2;
 
 BEGIN { eval q{ use vars qw($VERSION $_warning) } }
 
-$VERSION = sprintf '%d.%02d', q$Revision: 0.58 $ =~ m/(\d+)/oxmsg;
+$VERSION = sprintf '%d.%02d', q$Revision: 0.59 $ =~ m/(\d+)/oxmsg;
 
 # poor Symbol.pm - substitute of real Symbol.pm
 BEGIN {
@@ -2550,7 +2550,7 @@ sub e_qr_q {
         \[\:\^ [a-z]+ \:\] |
         \[\:   [a-z]+ \:\] |
         \[\^               |
-        [$@/\\]            |
+        [\$\@/\\]          |
         \\?    (?:$q_char)
     )}oxmsg;
 
@@ -2604,7 +2604,7 @@ sub e_qr_q {
         }
 
         # escape $ @ / and \
-        elsif ($char[$i] =~ m{\A [$@/\\] \z}oxms) {
+        elsif ($char[$i] =~ m{\A [\$\@/\\] \z}oxms) {
             $char[$i] = '\\' . $char[$i];
         }
 
@@ -2882,7 +2882,7 @@ sub e_s1_q {
         \[\:\^ [a-z]+ \:\] |
         \[\:   [a-z]+ \:\] |
         \[\^               |
-        [$@/\\]            |
+        [\$\@/\\]          |
         \\?    (?:$q_char)
     )}oxmsg;
 
@@ -2936,7 +2936,7 @@ sub e_s1_q {
         }
 
         # escape $ @ / and \
-        elsif ($char[$i] =~ m{\A [$@/\\] \z}oxms) {
+        elsif ($char[$i] =~ m{\A [\$\@/\\] \z}oxms) {
             $char[$i] = '\\' . $char[$i];
         }
 
@@ -2973,13 +2973,13 @@ sub e_s2_q {
 
     $slash = 'div';
 
-    my @char = $string =~ m/ \G ([$@\/\\]|$q_char) /oxmsg;
+    my @char = $string =~ m/ \G ([\$\@\/\\]|$q_char) /oxmsg;
     for (my $i=0; $i <= $#char; $i++) {
         if (0) {
         }
 
         # escape $ @ / and \
-        elsif ($char[$i] =~ m{\A [$@/\\] \z}oxms) {
+        elsif ($char[$i] =~ m{\A [\$\@/\\] \z}oxms) {
             $char[$i] = '\\' . $char[$i];
         }
     }
@@ -3846,6 +3846,10 @@ actually become a problem. Because when you use /o, you are sure not to change $
 =item * UTF2::substr as lvalue
 
 UTF2::substr differs from CORE::substr, and cannot be used as a lvalue.
+To change part of a string, you can use the optional fourth argument which is the
+replacement string.
+
+UTF2::substr($string, 13, 4, "JPerl");
 
 =item * Special variables $` and $& doesn't function
 
