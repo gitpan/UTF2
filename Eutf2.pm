@@ -23,7 +23,7 @@ BEGIN {
 
 BEGIN { eval q{ use vars qw($VERSION $_warning) } }
 
-$VERSION = sprintf '%d.%02d', q$Revision: 0.60 $ =~ m/(\d+)/xmsg;
+$VERSION = sprintf '%d.%02d', q$Revision: 0.62 $ =~ m/(\d+)/xmsg;
 
 # poor Symbol.pm - substitute of real Symbol.pm
 BEGIN {
@@ -507,23 +507,18 @@ sub Eutf2::rindex($$;$) {
 # UTF-2 regexp capture
 #
 {
-###if MULTIBYTE_ANCHORING
     # 10.3. Creating Persistent Private Variables
     # in Chapter 10. Subroutines
     # of ISBN 0-596-00313-7 Perl Cookbook, 2nd Edition.
 
     my $last_s_matched = 0;
 
-###endif
     sub Eutf2::capture($) {
-###if MULTIBYTE_ANCHORING
         if ($last_s_matched and ($_[0] =~ m/\A [1-9][0-9]* \z/oxms)) {
             return $_[0] + 1;
         }
-###endif
         return $_[0];
     }
-###if MULTIBYTE_ANCHORING
 
     # UTF-2 regexp mark last m// or qr// matched
     sub Eutf2::m_matched() {
@@ -543,7 +538,6 @@ sub Eutf2::rindex($$;$) {
 
     @Eutf2::m_matched = (qr/(?{Eutf2::m_matched})/);
     @Eutf2::s_matched = (qr/(?{Eutf2::s_matched})/);
-###endif
 }
 
 #
