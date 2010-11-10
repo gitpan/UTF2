@@ -58,12 +58,14 @@ To install this software without make, type the following:
 
 PROGRAM COMPOSITION
 
-   UTF2.pm      --- source code filter for UTF-2 script
-   Eutf2.pm     --- run-time routines for UTF2.pm
-   perl58.bat   --- find and run perl5.8  without %PATH% settings
-   perl510.bat  --- find and run perl5.10 without %PATH% settings
-   perl512.bat  --- find and run perl5.12 without %PATH% settings
-   perl64.bat   --- find and run perl64   without %PATH% settings
+   UTF2.pm               --- source code filter for UTF-2 script
+   Eutf2.pm              --- run-time routines for UTF2.pm
+   perl58.bat            --- find and run perl5.8  without %PATH% settings
+   perl510.bat           --- find and run perl5.10 without %PATH% settings
+   perl512.bat           --- find and run perl5.12 without %PATH% settings
+   perl64.bat            --- find and run perl64   without %PATH% settings
+   warnings.pm_          --- poor warnings.pm
+   warnings/register.pm_ --- poor warnings/register.pm
 
 DEPENDENCIES
 
