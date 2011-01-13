@@ -1,7 +1,10 @@
 UTF2.pm
 Eutf2.pm
+strict.pm_
 warnings.pm_
 warnings/register.pm_
+perl55.bat
+perl56.bat
 perl58.bat
 perl510.bat
 perl512.bat
@@ -178,7 +181,6 @@ t/177_jperlre.t
 t/178_jperlre.t
 t/179_jperlre.t
 t/180_jperlre.t
-t/181_jperlre.t
 t/182_jperlre.t
 t/183_jperlre.t
 t/184_jperlre.t
@@ -228,3 +230,9 @@ t/244_3open.t
 t/245_2binmode.t
 t/246_utf8.t
 t/247_bytes.t
+t/248_jscripter.t
+t/249_jscripter.t
+t/250_jscripter.t
+t/251_jscripter.t
+t/252_jscripter.t
+t/253_jscripter.t

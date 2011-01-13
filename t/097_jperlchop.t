@@ -4,7 +4,7 @@ die "This file is not encoded in UTF-2.\n" if q{あ} ne "\xe3\x81\x82";
 use UTF2;
 print "1..4\n";
 
-my $__FILE__ = $__FILE__;
+my $__FILE__ = __FILE__;
 
 #
 # chop, chomp
